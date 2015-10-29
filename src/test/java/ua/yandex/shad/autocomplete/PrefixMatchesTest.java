@@ -105,6 +105,30 @@ public class PrefixMatchesTest {
         result = instance.contains(word);
         assertEquals(expResult, result);
     }
+    
+     @Test
+    public void testDelete_manyElementsNotExist() {
+        System.out.println("delete");
+        String word = "world";
+        PrefixMatches instance = new PrefixMatches();
+        
+        instance.load("hello worsdld abc cde");
+        boolean expResult = false;
+        boolean result = instance.delete(word);
+        assertEquals(expResult, result);
+    }
+    
+     @Test
+    public void testDelete_manyElementsTestNotDeleteDeep() {
+        System.out.println("delete");
+        String word = "world";
+        PrefixMatches instance = new PrefixMatches();
+        
+        instance.load("hello world abc cde worldwerer wor");
+        boolean expResult = true;
+        boolean result = instance.delete(word);
+        assertEquals(expResult, result);
+    }
     /**
      * Test of wordsWithPrefix method, of class PrefixMatches.
      */
@@ -141,21 +165,7 @@ public class PrefixMatchesTest {
         // TODO review the generated test code and remove the default call to fail.
       //  fail("The test case is a prototype.");
     }
-    /**
-     * Test of wordsWithPrefix method, of class PrefixMatches.
-     */ /*
-    @Test
-    public void testWordsWithPrefix_String_int() {
-        System.out.println("wordsWithPrefix");
-        String pref = "";
-        int k = 0;
-        PrefixMatches instance = new PrefixMatches();
-        Iterable<String> expResult = null;
-        Iterable<String> result = instance.wordsWithPrefix(pref, k);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+
 
     /**
      * Test of size method, of class PrefixMatches.

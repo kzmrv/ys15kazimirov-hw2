@@ -15,7 +15,7 @@ import ua.yandex.shad.tries.Trie;
  * @author andrii
  */
 public class PrefixMatches {
-    public final int PREFLIMIT = 3;
+    public static final int PREFLIMIT = 3;
     private Trie trie;
 
     public PrefixMatches() {

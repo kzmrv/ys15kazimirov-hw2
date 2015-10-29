@@ -4,10 +4,10 @@ import java.util.LinkedList;
 
 public class RWayTrie implements Trie {
 
-    public final int ALPHABET_SIZE = 26;
+    public static final int ALPHABET_SIZE = 26;
     private Node root = new Node();
 
-    private class Node {
+    private static class Node {
 
         public Node() {
             next = new Node[ALPHABET_SIZE];
@@ -23,6 +23,11 @@ public class RWayTrie implements Trie {
         public void setWeight(int inWeight) {
             weight = inWeight;
         }
+        
+        public char getKey() {
+            return key;
+        }
+        
         char key;
         int weight;
         private Node[] next;
@@ -34,16 +39,18 @@ public class RWayTrie implements Trie {
     }
 
     public void add(Node node, Tuple tuple, int position) {
-        int wordLength = tuple.term.length();
+        String term = tuple.getTerm();
+        int weight = tuple.getWeight();
+        int wordLength = term.length();
         if (position == wordLength) {
-            node.setWeight(tuple.weight);
+            node.setWeight(weight);
             return;
         }
-        int insertPos = (int) tuple.term.charAt(position) - 'a';
+        int insertPos = (int) term.charAt(position) - 'a';
         if (node.next[insertPos] == null) {
-            node.next[insertPos] = new Node(tuple.term.charAt(position), 0);
+            node.next[insertPos] = new Node(term.charAt(position), 0);
         }
-        add(node.next[(int) tuple.term.charAt(position) - 'a'],
+        add(node.next[(int) term.charAt(position) - 'a'],
                 tuple, position + 1);
     }
 
@@ -91,18 +98,15 @@ public class RWayTrie implements Trie {
         if (!contains(word)) {
             return false;
         }
-        Node node = iterateToLast(root, word);
-        if (node == null) {
-            return false;
-        }
         root = delete(root, word, 0);
         return true;
     }
 
     @Override
     public Iterable<String> words() {
-       return getWords(root);
+        return getWords(root);
     }
+
     private Iterable<String> getWords(Node node) {
         LinkedList<String> result = new LinkedList<String>();
         LinkedList<Node> activeNodes = new LinkedList<Node>();
@@ -112,19 +116,20 @@ public class RWayTrie implements Trie {
         while (!activeNodes.isEmpty()) {
             Node currNode = activeNodes.pollFirst();
             String currString = activeStrings.pollFirst();
-            if(currNode.weight!=0) {
+            if (currNode.weight != 0) {
                 result.add(currString);
             }
             for (int i = 0; i < ALPHABET_SIZE; i++) {
                 Node next = currNode.next[i];
-                if(next!=null) {
+                if (next != null) {
                     activeNodes.add(next);
-                    activeStrings.add(currString+next.key);
+                    activeStrings.add(currString + next.key);
                 }
             }
         }
         return result;
     }
+
     @Override
     public Iterable<String> wordsWithPrefix(String s) {
         LinkedList<String> prevRes = new LinkedList<String>();
@@ -135,9 +140,9 @@ public class RWayTrie implements Trie {
                 return prevRes;
             }
         }
-        prevRes = (LinkedList)getWords(current);
+        prevRes = (LinkedList) getWords(current);
         LinkedList<String> result = new LinkedList<String>();
-        for(String element : prevRes) {
+        for (String element : prevRes) {
             result.add(s + element);
         }
 
