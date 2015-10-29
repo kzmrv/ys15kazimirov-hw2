@@ -1,8 +1,6 @@
 package ua.yandex.shad.tries;
 
-import java.util.AbstractQueue;
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class RWayTrie implements Trie {
 
@@ -66,7 +64,7 @@ public class RWayTrie implements Trie {
         if (current == null) {
             return false;
         }
-        return (current.weight != 0);
+        return current.weight != 0;
     }
 
     private Node delete(Node node, String word, int position) {
@@ -144,18 +142,6 @@ public class RWayTrie implements Trie {
         }
 
         return result;
-    }
-
-    private void getWordsWithPrefix(String s, LinkedList<String> list, Node node) {
-        if (node == null) {
-            return;
-        }
-        if (node.weight != 0) {
-            list.add(s + node.key);
-        }
-        for (int i = 0; i < ALPHABET_SIZE; i++) {
-            getWordsWithPrefix(s + node.key, list, node.next[i]);
-        }
     }
 
     private int size(Node node) {
