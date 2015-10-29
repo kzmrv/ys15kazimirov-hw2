@@ -166,6 +166,22 @@ public class PrefixMatchesTest {
       //  fail("The test case is a prototype.");
     }
 
+    
+    @Test
+    public void testWordsWithPrefix_String_int_bigCounter() {
+        System.out.println("wordsWithPrefix");
+        String pref = "abc";
+        PrefixMatches instance = new PrefixMatches();
+        instance.load("hello world abc cde", "abcset");
+        Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
+                "abcset"));
+        Iterable<String> result = instance.wordsWithPrefix(pref,15);
+        LinkedList<String> listExp = (LinkedList) expResult;
+        LinkedList<String> listRes = (LinkedList) result;
+        assertListsEquals(listExp, listRes);
+        // TODO review the generated test code and remove the default call to fail.
+      //  fail("The test case is a prototype.");
+    }
 
     /**
      * Test of size method, of class PrefixMatches.

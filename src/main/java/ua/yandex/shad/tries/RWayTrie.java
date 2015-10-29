@@ -9,6 +9,10 @@ public class RWayTrie implements Trie {
 
     private static class Node {
 
+        private char key;
+        private int weight;
+        private Node[] next;
+        
         public Node() {
             next = new Node[ALPHABET_SIZE];
             weight = 0;
@@ -24,9 +28,7 @@ public class RWayTrie implements Trie {
             weight = inWeight;
         }
         
-        private char key;
-        private int weight;
-        private Node[] next;
+       
     }
 
     @Override
