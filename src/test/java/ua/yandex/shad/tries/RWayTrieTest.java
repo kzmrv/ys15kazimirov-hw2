@@ -14,7 +14,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.*;
 import static org.junit.Assert.*;
 
 /**
@@ -22,25 +21,6 @@ import static org.junit.Assert.*;
  * @author Vasyl
  */
 public class RWayTrieTest {
-
-    public RWayTrieTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of contains method, of class RWayTrie.
@@ -176,6 +156,26 @@ public class RWayTrieTest {
         assertListsEquals(listExp, listRes);
         
     }
+    
+    
+     @Test
+    public void testWordsWithPrefix_expectedEmpty() {
+        System.out.println("wordsWithPrefix");
+        String s = "opuf";
+        RWayTrie instance = new RWayTrie();
+        instance.add(new Tuple("sadqwe", 1));
+        instance.add(new Tuple("etgsad", 1));
+        instance.add(new Tuple("sad", 1));
+        instance.add(new Tuple("sadabc", 1));
+        Iterable<String> expResult = new LinkedList<String>();
+        Iterable<String> result = instance.wordsWithPrefix(s);
+        LinkedList<String> listExp = (LinkedList) expResult;
+        LinkedList<String> listRes = (LinkedList) result;
+        assertListsEquals(listExp, listRes);
+        
+    }
+
+    
 
     @Test
     public void testSize_zeroSize() {

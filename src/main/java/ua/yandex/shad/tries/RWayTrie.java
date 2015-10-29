@@ -24,12 +24,8 @@ public class RWayTrie implements Trie {
             weight = inWeight;
         }
         
-        public char getKey() {
-            return key;
-        }
-        
-        char key;
-        int weight;
+        private char key;
+        private int weight;
         private Node[] next;
     }
 
