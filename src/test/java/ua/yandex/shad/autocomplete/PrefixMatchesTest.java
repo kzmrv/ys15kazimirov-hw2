@@ -7,6 +7,7 @@ package ua.yandex.shad.autocomplete;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -144,8 +145,6 @@ public class PrefixMatchesTest {
             listRes.add(result.iterator().next());
         }
         assertListsEquals(listExp, listRes);
-        // TODO review the generated test code and remove the default call to fail.
-        //  fail("The test case is a prototype.");
     }
 
     @Test
@@ -165,6 +164,29 @@ public class PrefixMatchesTest {
         assertListsEquals(listExp, listRes);
         // TODO review the generated test code and remove the default call to fail.
         //  fail("The test case is a prototype.");
+    }
+
+    
+        @Test(expected = NoSuchElementException.class)
+        public void testWordsWithPrefix_String_int_iterableTest() {
+        System.out.println("wordsWithPrefix");
+        String pref = "abc";
+        PrefixMatches instance = new PrefixMatches();
+        instance.load("hello world abc cde", "abcset");
+        Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
+                "abcset"));
+        Iterable<String> result = instance.wordsWithPrefix(pref, 15);
+        LinkedList<String> listExp = (LinkedList) expResult;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
+        result.iterator().hasNext();
+        boolean a = result.iterator().hasNext();
+        if(a) {
+            throw new AssertionError("Iterable hasNext fail : expected false");
+        }
+        result.iterator().next();
     }
 
     /**

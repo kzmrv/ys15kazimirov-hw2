@@ -174,6 +174,27 @@ public class RWayTrieTest {
 
     }
 
+     @Test(expected = NoSuchElementException.class)
+    public void testWordsWithPrefix_testIterable() {
+        System.out.println("wordsWithPrefix");
+        String s = "sad";
+        RWayTrie instance = new RWayTrie();
+        instance.add(new Tuple("sadqwe", 1));
+        instance.add(new Tuple("etgsad", 1));
+        instance.add(new Tuple("sad", 1));
+        instance.add(new Tuple("sadabc", 1));
+        Iterable<String> expResult = new LinkedList<>(Arrays.asList("sad",
+                "sadabc", "sadqwe"));
+        Iterable<String> result = instance.wordsWithPrefix(s);
+        LinkedList<String> listExp = (LinkedList) expResult;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
+        boolean a = result.iterator().hasNext();
+        result.iterator().next();
+    }
+    
     @Test
     public void testWordsWithPrefix_expectedEmpty() {
         System.out.println("wordsWithPrefix");
@@ -202,6 +223,21 @@ public class RWayTrieTest {
         if (result.iterator().next() == null) {
             throw new AssertionError("Expected null object");
         }
+    }
+    
+       @Test(expected = NoSuchElementException.class)
+        public void testWordsWithPrefix_noSuchElementInIterableException() {
+        System.out.println("wordsWithPrefix");
+        String s = "opuf";
+        RWayTrie instance = new RWayTrie();
+        instance.add(new Tuple("sadqwe", 1));
+        instance.add(new Tuple("etgsad", 1));
+        instance.add(new Tuple("sad", 1));
+        instance.add(new Tuple("sadabc", 1));
+        Iterable<String> result = instance.wordsWithPrefix(s);
+        result.iterator().next();
+        result.iterator().next();
+        result.iterator().next();
     }
 
     @Test
