@@ -1,8 +1,6 @@
 package ua.yandex.shad.tries;
 
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class RWayTrie implements Trie {
@@ -40,7 +38,7 @@ public class RWayTrie implements Trie {
             }
         }
 
-        public Typename At(int index) {
+        public Typename at(int index) {
             return values[index];
         }
     }
@@ -143,7 +141,6 @@ public class RWayTrie implements Trie {
 
     private static class BfsStringIterable implements Iterable<String> {
 
-        private Node prefix;
         private DynamicArray<Node> layout;
         private int pointer;
 
@@ -156,50 +153,52 @@ public class RWayTrie implements Trie {
 
         @Override
         public Iterator iterator() {
-            return new Iterator<String>() {
+            return new BfsStringIterator();
+        }
 
-                @Override
-                public boolean hasNext() {
-                    return layout.length != 0;
+        public class BfsStringIterator implements Iterator<String> {
+
+            @Override
+            public boolean hasNext() {
+                return layout.length != 0;
+            }
+
+            @Override
+            public String next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
                 }
-
-                @Override
-                public String next() {
-                    if (!hasNext()) {
-                        throw new NoSuchElementException();
-                    }
-                    boolean found = false;
-                    Node resultNode = null;
-                    while (!found) {
-                        resultNode = layout.At(pointer++);
-                        if (pointer == layout.length) {
-                            DynamicArray<Node> newLayout = new DynamicArray();
-                            for (int i = 0; i < layout.length; i++) {
-                                for (int j = 0; j < ALPHABET_SIZE; j++) {
-                                    Node child = (layout.At(i)).next[j];
-                                    if (child != null) {
-                                        newLayout.add(child);
-                                    }
+                boolean found = false;
+                Node resultNode = null;
+                while (!found) {
+                    resultNode = layout.at(pointer++);
+                    if (pointer == layout.length) {
+                        DynamicArray<Node> newLayout = new DynamicArray();
+                        for (int i = 0; i < layout.length; i++) {
+                            for (int j = 0; j < ALPHABET_SIZE; j++) {
+                                Node child = layout.at(i).next[j];
+                                if (child != null) {
+                                    newLayout.add(child);
                                 }
                             }
-                            layout = newLayout;
-                            pointer = 0;
                         }
-                        if (resultNode.weight != 0) {
-                            found = true;
-                        }
+                        layout = newLayout;
+                        pointer = 0;
+                    }
+                    if (resultNode.weight != 0) {
+                        found = true;
+                    }
 
-                    }
-                    String resultString = "";
-                    resultString += resultNode.key;
-                    while (resultNode.parent != null) {
-                        resultNode = resultNode.parent;
-                        resultString += resultNode.key;
-                    }
-                    return new StringBuilder(resultString).reverse().
-                            toString().trim();
                 }
-            };
+                String resultString = "";
+                resultString += resultNode.key;
+                while (resultNode.parent != null) {
+                    resultNode = resultNode.parent;
+                    resultString += resultNode.key;
+                }
+                return new StringBuffer(resultString).reverse().
+                        toString().trim();
+            }
         }
 
     }
@@ -208,19 +207,21 @@ public class RWayTrie implements Trie {
 
         @Override
         public Iterator<String> iterator() {
-            return new Iterator<String>() {
+            return new EmptyStringIterator();
+        }
 
-                @Override
-                public boolean hasNext() {
-                    return false;
-                }
+        private static class EmptyStringIterator implements Iterator<String> {
 
-                @Override
-                public String next() {
-                    throw new NoSuchElementException();
-                }
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
 
-            };
+            @Override
+            public String next() {
+                throw new NoSuchElementException();
+            }
+
         }
 
     }

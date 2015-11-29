@@ -62,44 +62,43 @@ public class PrefixMatches {
 
         @Override
         public Iterator iterator() {
-            return new Iterator() {
+            return new LimitedBfsIterator();
+        }
 
-                @Override
-                public boolean hasNext() {
-                    if (lenLimit <= lenCount) {
-                        return false;
-                    }
-                    if (stackString == null) {
-                        if (core.iterator().hasNext()) {
-                            stackString = (String) core.iterator().next();
-                            if (stackString.length() != lastLen) {
-                                lenCount++;
-                                lastLen = stackString.length();
-                            }
-                            return lenLimit > lenCount;
-                        }
-                        return false;
-                    }
-                    return true;
+        public class LimitedBfsIterator implements Iterator<String> {
+
+            @Override
+            public boolean hasNext() {
+                if (lenLimit <= lenCount) {
+                    return false;
                 }
-
-                @Override
-                public String next() {
-                    if (lenLimit <= lenCount) {
-                        throw new NoSuchElementException();
-                    }
-                    if (stackString == null) {
-                        if (!hasNext()) {
-                            throw new NoSuchElementException();
+                if (stackString == null) {
+                    if (core.iterator().hasNext()) {
+                        stackString = (String) core.iterator().next();
+                        if (stackString.length() != lastLen) {
+                            lenCount++;
+                            lastLen = stackString.length();
                         }
-
+                        return lenLimit > lenCount;
                     }
-                    String tmp = stackString;
-                    stackString = null;
-                    return tmp;
-
+                    return false;
                 }
-            };
+                return true;
+            }
+
+            @Override
+            public String next() {
+                if (lenLimit <= lenCount) {
+                    throw new NoSuchElementException();
+                }
+                if (stackString == null && !hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                String tmp = stackString;
+                stackString = null;
+                return tmp;
+
+            }
         }
 
     }
@@ -109,7 +108,7 @@ public class PrefixMatches {
     }
 
     public Iterable<String> wordsWithPrefix(String pref, int k) {
-       return new LimitedBfsIterable(trie.wordsWithPrefix(pref), k);
+        return new LimitedBfsIterable(trie.wordsWithPrefix(pref), k);
     }
 
     public int size() {
