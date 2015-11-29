@@ -178,6 +178,8 @@ public class PrefixMatchesTest {
         Iterable<String> result = instance.wordsWithPrefix(pref, 15);
         LinkedList<String> listExp = (LinkedList) expResult;
         LinkedList<String> listRes = new LinkedList<>();
+        result.iterator().hasNext();
+        result.iterator().hasNext();
         while (result.iterator().hasNext()) {
             listRes.add(result.iterator().next());
         }

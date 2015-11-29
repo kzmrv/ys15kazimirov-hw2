@@ -46,7 +46,7 @@ public class PrefixMatches {
         return trie.delete(word);
     }
 
-    public class LimitedBfsIterable implements Iterable<String> {
+    public static class LimitedBfsIterable implements Iterable<String> {
 
         private final Iterable core;
         private final int lenLimit;
@@ -88,10 +88,7 @@ public class PrefixMatches {
 
             @Override
             public String next() {
-                if (lenLimit <= lenCount) {
-                    throw new NoSuchElementException();
-                }
-                if (stackString == null && !hasNext()) {
+                if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
                 String tmp = stackString;

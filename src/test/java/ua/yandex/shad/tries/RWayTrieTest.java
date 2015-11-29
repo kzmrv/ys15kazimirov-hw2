@@ -188,6 +188,8 @@ public class RWayTrieTest {
         Iterable<String> result = instance.wordsWithPrefix(s);
         LinkedList<String> listExp = (LinkedList) expResult;
         LinkedList<String> listRes = new LinkedList<>();
+        result.iterator().hasNext();
+        result.iterator().hasNext();
         while (result.iterator().hasNext()) {
             listRes.add(result.iterator().next());
         }
