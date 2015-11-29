@@ -5,7 +5,8 @@
  */
 package ua.yandex.shad.autocomplete;
 
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import ua.yandex.shad.tries.RWayTrie;
 import ua.yandex.shad.tries.Tuple;
 import ua.yandex.shad.tries.Trie;
@@ -15,6 +16,7 @@ import ua.yandex.shad.tries.Trie;
  * @author andrii
  */
 public class PrefixMatches {
+
     public static final int PREFLIMIT = 3;
     private Trie trie;
 
@@ -44,27 +46,70 @@ public class PrefixMatches {
         return trie.delete(word);
     }
 
+    public class LimitedBfsIterable implements Iterable<String> {
+
+        private final Iterable core;
+        private final int lenLimit;
+        private int lenCount;
+        private String stackString;
+        private int lastLen;
+
+        public LimitedBfsIterable(Iterable core, int lenLimit) {
+            this.core = core;
+            this.lenLimit = lenLimit;
+            this.lenCount = -1;
+        }
+
+        @Override
+        public Iterator iterator() {
+            return new Iterator() {
+
+                @Override
+                public boolean hasNext() {
+                    if (lenLimit <= lenCount) {
+                        return false;
+                    }
+                    if (stackString == null) {
+                        if (core.iterator().hasNext()) {
+                            stackString = (String) core.iterator().next();
+                            if (stackString.length() != lastLen) {
+                                lenCount++;
+                                lastLen = stackString.length();
+                            }
+                            return lenLimit > lenCount;
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public String next() {
+                    if (lenLimit <= lenCount) {
+                        throw new NoSuchElementException();
+                    }
+                    if (stackString == null) {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException();
+                        }
+
+                    }
+                    String tmp = stackString;
+                    stackString = null;
+                    return tmp;
+
+                }
+            };
+        }
+
+    }
+
     public Iterable<String> wordsWithPrefix(String pref) {
         return wordsWithPrefix(pref, PREFLIMIT);
     }
 
     public Iterable<String> wordsWithPrefix(String pref, int k) {
-        LinkedList<String> values = (LinkedList) trie.wordsWithPrefix(pref);
-        LinkedList<String> result = new LinkedList<String>();
-        int counter = k - 1;
-        String prev = values.peekFirst();
-        for (String element : values) {
-            if (prev.length() < element.length()) {
-                counter--;
-            }
-            if (counter < 0) {
-                return result;
-            }
-            
-            result.add(element);
-            prev = element;
-        }
-        return result;
+       return new LimitedBfsIterable(trie.wordsWithPrefix(pref), k);
     }
 
     public int size() {

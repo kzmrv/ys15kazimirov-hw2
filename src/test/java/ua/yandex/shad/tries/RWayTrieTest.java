@@ -5,14 +5,10 @@
  */
 package ua.yandex.shad.tries;
 
-import com.sun.java.accessibility.util.EventID;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Iterator;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -110,18 +106,16 @@ public class RWayTrieTest {
         instance.add(new Tuple("etgsad", 1));
         instance.add(new Tuple("sad", 1));
         instance.add(new Tuple("sadabc", 1));
-        Iterable<String> expResult = new LinkedList<String>
-        (Arrays.asList("etgsad", "sad",
+        LinkedList<String> expResult = new LinkedList<>(Arrays.asList("etgsad", "sad",
                 "sadabc", "sadqwe", "vasa"));
         Iterable<String> result = instance.words();
-        LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
+        LinkedList<String> listExp = expResult;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
         assertListsEquals(listExp, listRes);
     }
-
-    /**
-     * Test of wordsWithPrefix method, of class RWayTrie.
-     */
     
     public static void assertListsEquals(LinkedList<String> listExp,
             LinkedList<String> listRes) throws AssertionError {
@@ -132,13 +126,33 @@ public class RWayTrieTest {
         }
         for (String element : listExp) {
             if (!(listRes.contains(element))) {
-                throw new AssertionError("Result list does not contain " + 
-                        element);
+                throw new AssertionError("Result list does not contain "
+                        + element);
             }
         }
-        
+
     }
-    
+    /*
+     public static void assertIterableEquals(Iterable<String> itExp,
+     Iterable<String> itRes) throws AssertionError {
+     while (itExp.iterator().hasNext()) {
+     if (!itRes.iterator().hasNext()) {
+     throw new AssertionError("Unexpected end of result iterable"
+     + " reached at element" + itExp.iterator().next());
+     }
+     String expElement = itExp.iterator().next();
+     String resElement = itRes.iterator().next();
+     if (!expElement.equals(resElement)) {
+     throw new AssertionError("Iterable result difference: "
+     + "expected " + expElement + "instead of "
+     + resElement);
+
+     }
+     }
+     if(itRes.iterator().hasNext())
+     }
+     */
+
     @Test
     public void testWordsWithPrefix_manyElements() {
         System.out.println("wordsWithPrefix");
@@ -148,17 +162,19 @@ public class RWayTrieTest {
         instance.add(new Tuple("etgsad", 1));
         instance.add(new Tuple("sad", 1));
         instance.add(new Tuple("sadabc", 1));
-        Iterable<String> expResult = new LinkedList<String>(Arrays.asList("sad",
+        Iterable<String> expResult = new LinkedList<>(Arrays.asList("sad",
                 "sadabc", "sadqwe"));
         Iterable<String> result = instance.wordsWithPrefix(s);
         LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
         assertListsEquals(listExp, listRes);
-        
+
     }
-    
-    
-     @Test
+
+    @Test
     public void testWordsWithPrefix_expectedEmpty() {
         System.out.println("wordsWithPrefix");
         String s = "opuf";
@@ -167,15 +183,26 @@ public class RWayTrieTest {
         instance.add(new Tuple("etgsad", 1));
         instance.add(new Tuple("sad", 1));
         instance.add(new Tuple("sadabc", 1));
-        Iterable<String> expResult = new LinkedList<String>();
         Iterable<String> result = instance.wordsWithPrefix(s);
-        LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
-        assertListsEquals(listExp, listRes);
-        
+        if (result.iterator().hasNext()) {
+            throw new AssertionError("Expected empty iterator");
+        }
     }
 
-    
+    @Test(expected = NoSuchElementException.class)
+    public void testWordsWithPrefix_expectedNoElementException() {
+        System.out.println("wordsWithPrefix");
+        String s = "opuf";
+        RWayTrie instance = new RWayTrie();
+        instance.add(new Tuple("sadqwe", 1));
+        instance.add(new Tuple("etgsad", 1));
+        instance.add(new Tuple("sad", 1));
+        instance.add(new Tuple("sadabc", 1));
+        Iterable<String> result = instance.wordsWithPrefix(s);
+        if (result.iterator().next() == null) {
+            throw new AssertionError("Expected null object");
+        }
+    }
 
     @Test
     public void testSize_zeroSize() {

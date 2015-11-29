@@ -1,34 +1,70 @@
 package ua.yandex.shad.tries;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class RWayTrie implements Trie {
 
+    public static class DynamicArray<Typename> {
+
+        private Typename[] values;
+        private int length;
+
+        public DynamicArray(int length) {
+            values = (Typename[]) new Object[length];
+        }
+
+        public DynamicArray() {
+            this(0);
+        }
+
+        public void add(Typename... elements) {
+            if (values.length == 0) {
+                values = (Typename[]) new Object[elements.length];
+                this.length = elements.length;
+                System.arraycopy(elements, 0, values, 0, elements.length);
+            } else {
+                int finalLength = values.length;
+                while (elements.length + this.length > finalLength) {
+                    finalLength *= 2;
+                }
+                Typename[] newArr = (Typename[]) new Object[finalLength];
+
+                System.arraycopy(this.values, 0, newArr, 0, this.length);
+                System.arraycopy(elements, 0, newArr, this.length,
+                        elements.length);
+                values = newArr;
+                this.length += elements.length;
+            }
+        }
+
+        public Typename At(int index) {
+            return values[index];
+        }
+    }
+
     public static final int ALPHABET_SIZE = 26;
-    private Node root = new Node();
+    private Node root = new Node(' ', 0, null);
 
     private static class Node {
 
         private char key;
         private int weight;
         private Node[] next;
-        
-        public Node() {
-            next = new Node[ALPHABET_SIZE];
-            weight = 0;
-        }
+        private Node parent;
 
-        public Node(char inKey, int inWeight) {
+        public Node(char inKey, int inWeight, Node parent) {
             key = inKey;
             weight = inWeight;
             next = new Node[ALPHABET_SIZE];
+            this.parent = parent;
         }
 
         public void setWeight(int inWeight) {
             weight = inWeight;
         }
-        
-       
     }
 
     @Override
@@ -36,7 +72,7 @@ public class RWayTrie implements Trie {
         add(root, tuple, 0);
     }
 
-    public void add(Node node, Tuple tuple, int position) {
+    private void add(Node node, Tuple tuple, int position) {
         String term = tuple.getTerm();
         int weight = tuple.getWeight();
         int wordLength = term.length();
@@ -46,7 +82,7 @@ public class RWayTrie implements Trie {
         }
         int insertPos = (int) term.charAt(position) - 'a';
         if (node.next[insertPos] == null) {
-            node.next[insertPos] = new Node(term.charAt(position), 0);
+            node.next[insertPos] = new Node(term.charAt(position), 0, node);
         }
         add(node.next[(int) term.charAt(position) - 'a'],
                 tuple, position + 1);
@@ -105,46 +141,104 @@ public class RWayTrie implements Trie {
         return getWords(root);
     }
 
-    private Iterable<String> getWords(Node node) {
-        LinkedList<String> result = new LinkedList<String>();
-        LinkedList<Node> activeNodes = new LinkedList<Node>();
-        LinkedList<String> activeStrings = new LinkedList<String>();
-        activeNodes.add(node);
-        activeStrings.add("");
-        while (!activeNodes.isEmpty()) {
-            Node currNode = activeNodes.pollFirst();
-            String currString = activeStrings.pollFirst();
-            if (currNode.weight != 0) {
-                result.add(currString);
-            }
-            for (int i = 0; i < ALPHABET_SIZE; i++) {
-                Node next = currNode.next[i];
-                if (next != null) {
-                    activeNodes.add(next);
-                    activeStrings.add(currString + next.key);
-                }
-            }
+    private static class BfsStringIterable implements Iterable<String> {
+
+        private Node prefix;
+        private DynamicArray<Node> layout;
+        private int pointer;
+
+        public BfsStringIterable(Node prefix) {
+            this.layout = new DynamicArray<>(0);
+            this.layout.add(prefix);
+            pointer = 0;
+
         }
-        return result;
+
+        @Override
+        public Iterator iterator() {
+            return new Iterator<String>() {
+
+                @Override
+                public boolean hasNext() {
+                    return layout.length != 0;
+                }
+
+                @Override
+                public String next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    boolean found = false;
+                    Node resultNode = null;
+                    while (!found) {
+                        resultNode = layout.At(pointer++);
+                        if (pointer == layout.length) {
+                            DynamicArray<Node> newLayout = new DynamicArray();
+                            for (int i = 0; i < layout.length; i++) {
+                                for (int j = 0; j < ALPHABET_SIZE; j++) {
+                                    Node child = (layout.At(i)).next[j];
+                                    if (child != null) {
+                                        newLayout.add(child);
+                                    }
+                                }
+                            }
+                            layout = newLayout;
+                            pointer = 0;
+                        }
+                        if (resultNode.weight != 0) {
+                            found = true;
+                        }
+
+                    }
+                    String resultString = "";
+                    resultString += resultNode.key;
+                    while (resultNode.parent != null) {
+                        resultNode = resultNode.parent;
+                        resultString += resultNode.key;
+                    }
+                    return new StringBuilder(resultString).reverse().
+                            toString().trim();
+                }
+            };
+        }
+
+    }
+
+    private static class EmptyStringIterable implements Iterable<String> {
+
+        @Override
+        public Iterator<String> iterator() {
+            return new Iterator<String>() {
+
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public String next() {
+                    throw new NoSuchElementException();
+                }
+
+            };
+        }
+
+    }
+
+    private Iterable<String> getWords(Node node) {
+        return new BfsStringIterable(node);
     }
 
     @Override
     public Iterable<String> wordsWithPrefix(String s) {
-        LinkedList<String> prevRes = new LinkedList<String>();
         Node current = root;
         for (int i = 0; i < s.length(); i++) {
             current = current.next[s.charAt(i) - 'a'];
             if (current == null) {
-                return prevRes;
+                return new EmptyStringIterable();
             }
         }
-        prevRes = (LinkedList) getWords(current);
-        LinkedList<String> result = new LinkedList<String>();
-        for (String element : prevRes) {
-            result.add(s + element);
-        }
-
-        return result;
+        return getWords(current);
     }
 
     private int size(Node node) {

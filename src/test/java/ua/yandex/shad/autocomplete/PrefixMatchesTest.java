@@ -7,10 +7,6 @@ package ua.yandex.shad.autocomplete;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -19,29 +15,7 @@ import static org.junit.Assert.*;
  * @author Vasyl
  */
 public class PrefixMatchesTest {
-    
-    public PrefixMatchesTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
-    /**
-     * Test of load method, of class PrefixMatches.
-     */
     @Test
     public void testLoad() {
         System.out.println("load");
@@ -50,7 +24,7 @@ public class PrefixMatchesTest {
         int result = instance.load("hello world in the", "ololo try a i lock");
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
-       // fail("The test case is a prototype.");
+        // fail("The test case is a prototype.");
     }
 
     /**
@@ -66,8 +40,9 @@ public class PrefixMatchesTest {
         boolean result = instance.contains(word);
         assertEquals(expResult, result);
     }
+
     @Test
-     public void testContains_expectFalse() {
+    public void testContains_expectFalse() {
         System.out.println("contains");
         String word = "abc";
         PrefixMatches instance = new PrefixMatches();
@@ -91,12 +66,12 @@ public class PrefixMatchesTest {
         assertEquals(expResult, result);
     }
 
-     @Test
+    @Test
     public void testDelete_manyElements() {
         System.out.println("delete");
         String word = "world";
         PrefixMatches instance = new PrefixMatches();
-        
+
         instance.load("hello world abc cde");
         boolean expResult = true;
         boolean result = instance.delete(word);
@@ -105,30 +80,31 @@ public class PrefixMatchesTest {
         result = instance.contains(word);
         assertEquals(expResult, result);
     }
-    
-     @Test
+
+    @Test
     public void testDelete_manyElementsNotExist() {
         System.out.println("delete");
         String word = "world";
         PrefixMatches instance = new PrefixMatches();
-        
+
         instance.load("hello worsdld abc cde");
         boolean expResult = false;
         boolean result = instance.delete(word);
         assertEquals(expResult, result);
     }
-    
-     @Test
+
+    @Test
     public void testDelete_manyElementsTestNotDeleteDeep() {
         System.out.println("delete");
         String word = "world";
         PrefixMatches instance = new PrefixMatches();
-        
+
         instance.load("hello world abc cde worldwerer wor");
         boolean expResult = true;
         boolean result = instance.delete(word);
         assertEquals(expResult, result);
     }
+
     /**
      * Test of wordsWithPrefix method, of class PrefixMatches.
      */
@@ -137,16 +113,19 @@ public class PrefixMatchesTest {
         System.out.println("wordsWithPrefix");
         String pref = "abc";
         PrefixMatches instance = new PrefixMatches();
-        instance.load("hello world abc cde", "abcset", "abchel", "abctrie", 
-                "abcd", "abcde","abcdefgh","abce");
+        instance.load("hello world abc cde", "abcset", "abchel", "abctrie",
+                "abcd", "abcde", "abcdefgh", "abce");
         Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
-                "abcd", "abce","abcde"));
+                "abcd", "abce", "abcde"));
         Iterable<String> result = instance.wordsWithPrefix(pref);
         LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
         assertListsEquals(listExp, listRes);
         // TODO review the generated test code and remove the default call to fail.
-      //  fail("The test case is a prototype.");
+        //  fail("The test case is a prototype.");
     }
 
     @Test
@@ -154,19 +133,21 @@ public class PrefixMatchesTest {
         System.out.println("wordsWithPrefix");
         String pref = "abc";
         PrefixMatches instance = new PrefixMatches();
-        instance.load("hello world abc cde", "abcset", "abchel", "abctrie", 
-                "abcd", "abcde","abcdefgh","abce");
+        instance.load("hello world abc cde", "abcset", "abchel", "abctrie",
+                "abcd", "abcde", "abcdefgh", "abce");
         Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
-                "abcd", "abce","abcde", "abcset", "abchel"));
-        Iterable<String> result = instance.wordsWithPrefix(pref,4);
+                "abcd", "abce", "abcde", "abcset", "abchel"));
+        Iterable<String> result = instance.wordsWithPrefix(pref, 4);
         LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
         assertListsEquals(listExp, listRes);
         // TODO review the generated test code and remove the default call to fail.
-      //  fail("The test case is a prototype.");
+        //  fail("The test case is a prototype.");
     }
 
-    
     @Test
     public void testWordsWithPrefix_String_int_bigCounter() {
         System.out.println("wordsWithPrefix");
@@ -175,12 +156,15 @@ public class PrefixMatchesTest {
         instance.load("hello world abc cde", "abcset");
         Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
                 "abcset"));
-        Iterable<String> result = instance.wordsWithPrefix(pref,15);
+        Iterable<String> result = instance.wordsWithPrefix(pref, 15);
         LinkedList<String> listExp = (LinkedList) expResult;
-        LinkedList<String> listRes = (LinkedList) result;
+        LinkedList<String> listRes = new LinkedList<>();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
         assertListsEquals(listExp, listRes);
         // TODO review the generated test code and remove the default call to fail.
-      //  fail("The test case is a prototype.");
+        //  fail("The test case is a prototype.");
     }
 
     /**
@@ -196,12 +180,12 @@ public class PrefixMatchesTest {
         assertEquals(expResult, result);
 
     }
-    
-     public static void assertListsEquals(LinkedList<String> listExp,
+
+    public static void assertListsEquals(LinkedList<String> listExp,
             LinkedList<String> listRes) throws AssertionError {
-         for(String element : listRes) {
-             System.out.println(element);
-         }
+        for (String element : listRes) {
+            System.out.println(element);
+        }
         if (listExp.size() != listRes.size()) {
             throw new AssertionError("Lists have different length : expected "
                     + Integer.toString(listExp.size()) + " and result was "
@@ -209,12 +193,11 @@ public class PrefixMatchesTest {
         }
         for (String element : listExp) {
             if (!(listRes.contains(element))) {
-                throw new AssertionError("Result list does not contain " + 
-                        element);
+                throw new AssertionError("Result list does not contain "
+                        + element);
             }
         }
-        
+
     }
-    
-    
+
 }
