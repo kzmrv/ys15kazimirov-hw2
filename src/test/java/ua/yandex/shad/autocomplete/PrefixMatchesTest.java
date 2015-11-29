@@ -144,6 +144,10 @@ public class PrefixMatchesTest {
         while (result.iterator().hasNext()) {
             listRes.add(result.iterator().next());
         }
+        boolean a = result.iterator().hasNext();
+        if(a) {
+            fail("HasNext Error : expected false");
+        }
         assertListsEquals(listExp, listRes);
     }
 
@@ -183,6 +187,33 @@ public class PrefixMatchesTest {
         while (result.iterator().hasNext()) {
             listRes.add(result.iterator().next());
         }
+        result.iterator().hasNext();
+        boolean a = result.iterator().hasNext();
+        if(a) {
+            throw new AssertionError("Iterable hasNext fail : expected false");
+        }
+        result.iterator().next();
+    }
+        
+         @Test(expected = NoSuchElementException.class)
+        public void testWordsWithPrefix_String_int_iterableTestShortPrefixes() {
+        System.out.println("wordsWithPrefix");
+        String pref = "abc";
+        PrefixMatches instance = new PrefixMatches();
+        instance.load("hello", "world" ,"abc", "cde", "absd", "sfgsrgr",
+                "sdgf", "f", "fdfd", "abcset", "abababa");
+        Iterable<String> expResult = new LinkedList<String>(Arrays.asList("abc",
+                "abcset"));
+        Iterable<String> result = instance.wordsWithPrefix(pref, 3);
+        LinkedList<String> listExp = (LinkedList) expResult;
+        LinkedList<String> listRes = new LinkedList<>();
+        result.iterator().hasNext();
+        result.iterator().hasNext();
+        while (result.iterator().hasNext()) {
+            listRes.add(result.iterator().next());
+        }
+        result.iterator().hasNext();
+        result.iterator().hasNext();
         result.iterator().hasNext();
         boolean a = result.iterator().hasNext();
         if(a) {
